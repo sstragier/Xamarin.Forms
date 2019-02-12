@@ -24,7 +24,7 @@
 
 			layout.Children.Add(generator);
 
-			var resetter = new Resetter(collectionView);
+			var resetter = new Resetter<CollectionViewGalleryTestItem>(collectionView);
 			layout.Children.Add(resetter);
 			Grid.SetRow(resetter, 1);
 

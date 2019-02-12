@@ -1,6 +1,6 @@
 ﻿namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
 {
-	internal class MultiItemRemover : MultiTestObservableCollectionModifier
+	internal class MultiItemRemover<T> : MultiTestObservableCollectionModifier<T>
 	{
 		readonly bool _withIndex;
 
@@ -19,7 +19,7 @@
 
 		protected override string LabelText => "Indexes (start, end):";
 
-		protected override void ModifyObservableCollection(MultiTestObservableCollection<CollectionViewGalleryTestItem> observableCollection, params int[] indexes)
+		protected override void ModifyObservableCollection(MultiTestObservableCollection<T> observableCollection, params int[] indexes)
 		{
 			if (indexes.Length < 2)
 			{

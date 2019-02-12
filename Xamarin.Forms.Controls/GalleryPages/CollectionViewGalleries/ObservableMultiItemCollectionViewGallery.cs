@@ -1,4 +1,6 @@
-﻿namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
+﻿using System;
+
+namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
 {
 	internal class ObservableMultiItemCollectionViewGallery : ContentPage
 	{
@@ -28,11 +30,13 @@
 
 			var generator = new ItemsSourceGenerator(collectionView, initialItems, ItemsSourceType.MultiTestObservableCollection);
 			
-			var remover = new MultiItemRemover(collectionView, withIndex);
+			var remover = new MultiItemRemover<CollectionViewGalleryTestItem>(collectionView, withIndex);
 
-			var adder = new MultiItemAdder(collectionView, withIndex);
-			var replacer = new MultiItemReplacer(collectionView);
-			var mover = new MultiItemMover(collectionView);
+			var adder = new MultiItemAdder<CollectionViewGalleryTestItem>(collectionView, 
+				(n) => new CollectionViewGalleryTestItem(DateTime.Now.AddDays(n), $"Added", "coffee.png", n), withIndex);
+			var replacer = new MultiItemReplacer<CollectionViewGalleryTestItem>(collectionView, 
+				(n) => new CollectionViewGalleryTestItem(DateTime.Now.AddDays(n), $"Added", "coffee.png", n));
+			var mover = new MultiItemMover<CollectionViewGalleryTestItem>(collectionView);
 
 			layout.Children.Add(generator);
 

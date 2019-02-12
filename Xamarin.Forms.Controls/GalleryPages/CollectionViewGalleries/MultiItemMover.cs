@@ -1,6 +1,6 @@
 ﻿namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
 {
-	internal class MultiItemMover : MultiTestObservableCollectionModifier
+	internal class MultiItemMover<T> : MultiTestObservableCollectionModifier<T>
 	{
 		public MultiItemMover(CollectionView cv) : base(cv, "Move")
 		{
@@ -16,7 +16,7 @@
 
 		protected override string LabelText => "Indexes (start, end, destination):";
 
-		protected override void ModifyObservableCollection(MultiTestObservableCollection<CollectionViewGalleryTestItem> observableCollection, params int[] indexes)
+		protected override void ModifyObservableCollection(MultiTestObservableCollection<T> observableCollection, params int[] indexes)
 		{
 			if (indexes.Length < 3)
 			{

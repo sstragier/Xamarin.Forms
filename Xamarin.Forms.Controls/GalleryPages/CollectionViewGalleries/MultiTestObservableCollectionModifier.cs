@@ -1,6 +1,6 @@
 ﻿namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
 {
-	internal abstract class MultiTestObservableCollectionModifier : CollectionModifier
+	internal abstract class MultiTestObservableCollectionModifier<T> : CollectionModifier
 	{
 		protected MultiTestObservableCollectionModifier(CollectionView cv, string buttonText) : base(cv, buttonText)
 		{
@@ -13,12 +13,12 @@
 				return;
 			}
 
-			if (_cv.ItemsSource is MultiTestObservableCollection<CollectionViewGalleryTestItem> observableCollection)
+			if (_cv.ItemsSource is MultiTestObservableCollection<T> observableCollection)
 			{
 				ModifyObservableCollection(observableCollection, indexes);
 			}
 		}
 
-		protected abstract void ModifyObservableCollection(MultiTestObservableCollection<CollectionViewGalleryTestItem> observableCollection, params int[] indexes);
+		protected abstract void ModifyObservableCollection(MultiTestObservableCollection<T> observableCollection, params int[] indexes);
 	}
 }

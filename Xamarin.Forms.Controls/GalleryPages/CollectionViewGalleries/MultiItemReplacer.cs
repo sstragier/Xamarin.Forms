@@ -3,14 +3,16 @@ using System.Collections.Generic;
 
 namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
 {
-	internal class MultiItemReplacer : MultiTestObservableCollectionModifier
+	internal class MultiItemReplacer<T> : MultiTestObservableCollectionModifier<T>
 	{
 		private readonly bool _withIndex;
+		private readonly Func<int, T> _itemCreator;
 
-		public MultiItemReplacer(CollectionView cv, bool withIndex = false) : base(cv, "Replace w/ 4 Items")
+		public MultiItemReplacer(CollectionView cv, Func<int, T> itemCreator, bool withIndex = false) : base(cv, "Replace w/ 4 Items")
 		{
 			Entry.Keyboard = Keyboard.Default;
 			_withIndex = withIndex;
+			_itemCreator = itemCreator;
 		}
 
 		protected override bool ParseIndexes(out int[] indexes)
@@ -22,7 +24,7 @@ namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
 
 		protected override string LabelText => "Indexes (start, end):";
 
-		protected override void ModifyObservableCollection(MultiTestObservableCollection<CollectionViewGalleryTestItem> observableCollection, params int[] indexes)
+		protected override void ModifyObservableCollection(MultiTestObservableCollection<T> observableCollection, params int[] indexes)
 		{
 			if (indexes.Length < 2)
 			{
@@ -34,12 +36,11 @@ namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries
 
 			if (index1 > -1 && index2 < observableCollection.Count && index1 <= index2)
 			{
-				var newItems = new List<CollectionViewGalleryTestItem>();
+				var newItems = new List<T>();
 
 				for (int n = 0; n < 4; n++)
 				{
-					newItems.Add(new CollectionViewGalleryTestItem(DateTime.Now.AddDays(n),
-						$"Added", "coffee.png", n));
+					newItems.Add(_itemCreator(n));
 				}
 
 				if (_withIndex)

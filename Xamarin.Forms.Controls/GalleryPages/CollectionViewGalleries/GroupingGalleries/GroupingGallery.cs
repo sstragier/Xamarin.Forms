@@ -30,6 +30,8 @@ namespace Xamarin.Forms.Controls.GalleryPages.CollectionViewGalleries.GroupingGa
 							new GroupingPlusSelection(), Navigation),
 						GalleryBuilder.NavButton("Grouping, switchable", () =>
 							new SwitchGrouping(), Navigation),
+						GalleryBuilder.NavButton("Grouping, Observable", () =>
+							new ObservableGrouping(), Navigation),
 					}
 				}
 			};
