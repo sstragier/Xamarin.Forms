@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using Android.Content;
-using Android.Content.Res;
 using Android.Support.V4.View;
 using Android.Views;
 using Android.Widget;
@@ -12,7 +11,7 @@ using Xamarin.Forms.Platform.Android.Material;
 using AProgressBar = Android.Widget.ProgressBar;
 using AView = Android.Views.View;
 
-[assembly: ExportRenderer(typeof(Xamarin.Forms.ActivityIndicator), typeof(MaterialActivityIndicatorRenderer), new[] { typeof(VisualRendererMarker.Material) })]
+[assembly: ExportRenderer(typeof(ActivityIndicator), typeof(MaterialActivityIndicatorRenderer), new[] { typeof(VisualRendererMarker.Material) })]
 
 namespace Xamarin.Forms.Platform.Android.Material
 {
@@ -24,7 +23,7 @@ namespace Xamarin.Forms.Platform.Android.Material
 		bool _disposed;
 
 		ActivityIndicator _element;
-		AProgressBar _control;
+		CircularProgress _control;
 
 		VisualElementTracker _visualElementTracker;
 		VisualElementRenderer _visualElementRenderer;
@@ -38,9 +37,15 @@ namespace Xamarin.Forms.Platform.Android.Material
 		{
 			VisualElement.VerifyVisualFlagEnabled();
 
-			_control = new AProgressBar(new ContextThemeWrapper(context, Resource.Style.XamarinFormsMaterialProgressBarCircular), null, Resource.Style.XamarinFormsMaterialProgressBarCircular);
-			_control.Indeterminate = true;
-			AddView(_control);
+			_control = new CircularProgress(new ContextThemeWrapper(context, Resource.Style.XamarinFormsMaterialProgressBarCircular), null, Resource.Style.XamarinFormsMaterialProgressBarCircular)
+			{
+				// limiting size to compare iOS realization
+				// https://github.com/material-components/material-components-ios/blob/develop/components/ActivityIndicator/src/MDCActivityIndicator.m#L425
+				MinSize = (int)Context.ToPixels(10),
+				MaxSize = (int)Context.ToPixels(144),
+				DefaultColor = MaterialColors.Light.PrimaryColor
+			};
+			AddView(Control);
 
 			_visualElementRenderer = new VisualElementRenderer(this);
 			_motionEventHelper = new MotionEventHelper();
@@ -111,8 +116,9 @@ namespace Xamarin.Forms.Platform.Android.Material
 
 				e.NewElement.PropertyChanged += OnElementPropertyChanged;
 
-				UpdatIsRunning();
-				UpdateColors();
+				UpdateColor();
+				UpdateBackgroundColor();
+				UpdateIsRunning();
 
 				ElevationHelper.SetElevation(this, e.NewElement);
 			}
@@ -122,10 +128,12 @@ namespace Xamarin.Forms.Platform.Android.Material
 		{
 			ElementPropertyChanged?.Invoke(this, e);
 
-			if (e.PropertyName == ActivityIndicator.IsRunningProperty.PropertyName)
-				UpdatIsRunning();
-			else if (e.PropertyName == ActivityIndicator.ColorProperty.PropertyName || e.PropertyName == VisualElement.BackgroundColorProperty.PropertyName)
-				UpdateColors();
+			if (e.Is(ActivityIndicator.IsRunningProperty))
+				UpdateIsRunning();
+			else if (e.Is(ActivityIndicator.ColorProperty))
+				UpdateColor();
+			else if (e.Is(VisualElement.BackgroundColorProperty))
+				UpdateBackgroundColor();
 		}
 
 		public override bool OnTouchEvent(MotionEvent e)
@@ -136,30 +144,22 @@ namespace Xamarin.Forms.Platform.Android.Material
 			return _motionEventHelper.HandleMotionEvent(Parent, e);
 		}
 
-		void UpdateColors()
+		void UpdateIsRunning()
 		{
-			if (Element == null || Control == null)
-				return;
-
-			// TODO: BackgroundColor is not supported by this control.
-
-			Color progressColor = Element.Color;
-
-			if (progressColor.IsDefault)
-			{
-				var progress = MaterialColors.Light.PrimaryColor;
-				_control.IndeterminateTintList = ColorStateList.ValueOf(progress);
-			}
-			else
-			{
-				var progress = progressColor.ToAndroid();
-				_control.IndeterminateTintList = ColorStateList.ValueOf(progress);
-			}
+			if (Element != null && _control != null)
+				_control.IsRunning = Element.IsRunning;
 		}
 
-		void UpdatIsRunning()
+		void UpdateColor()
 		{
-			_control.Visibility = Element.IsRunning ? ViewStates.Visible : ViewStates.Gone;
+			if (Element != null && _control != null)
+				_control.SetColor(Element.Color);
+		}
+
+		void UpdateBackgroundColor()
+		{
+			if (Element != null && _control != null)
+				_control.SetBackgroundColor(Element.BackgroundColor);
 		}
 
 		// IVisualElementRenderer
@@ -179,7 +179,8 @@ namespace Xamarin.Forms.Platform.Android.Material
 		}
 
 		void IVisualElementRenderer.SetElement(VisualElement element) =>
-			Element = (element as ActivityIndicator) ?? throw new ArgumentException("Element must be of type ActivityIndicator.");
+			Element = (element as ActivityIndicator) ??
+				throw new ArgumentException($"{element?.GetType().FullName} is not compatible. {nameof(element)} must be of type {nameof(ActivityIndicator)}.");
 
 		void IVisualElementRenderer.SetLabelFor(int? id)
 		{

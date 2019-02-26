@@ -713,7 +713,8 @@ namespace Xamarin.Forms.CustomAttributes
 
 		public enum Switch
 		{
-			IsToggled
+			IsToggled,
+			OnColor
 		}
 
 		public enum TimePicker
@@ -735,7 +736,9 @@ namespace Xamarin.Forms.CustomAttributes
 			MixedContentDisallowed,
 			MixedContentAllowed,
 			JavaScriptAlert,
-			EvaluateJavaScript
+			EvaluateJavaScript,
+			EnableZoomControls,
+			DisplayZoomControls
 		}
 
 		public enum UrlWebViewSource

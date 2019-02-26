@@ -152,8 +152,20 @@ namespace Xamarin.Forms.Platform.Android
 			UpdateParentPageTraversalOrder();
 		}
 
+		bool CheckCustomNextFocus(AView focused, FocusSearchDirection direction)
+		{
+			return direction == FocusSearchDirection.Forward && focused.NextFocusForwardId != NoId ||
+				direction == FocusSearchDirection.Down && focused.NextFocusDownId != NoId ||
+				direction == FocusSearchDirection.Left && focused.NextFocusLeftId != NoId ||
+				direction == FocusSearchDirection.Right && focused.NextFocusRightId != NoId ||
+				direction == FocusSearchDirection.Up && focused.NextFocusUpId != NoId;
+		}
+
 		public override AView FocusSearch(AView focused, [GeneratedEnum] FocusSearchDirection direction)
 		{
+			if (CheckCustomNextFocus(focused, direction))
+				return base.FocusSearch(focused, direction);
+
 			VisualElement element = Element as VisualElement;
 			int maxAttempts = 0;
 			var tabIndexes = element?.GetTabIndexesOnParentPage(out maxAttempts);
@@ -179,7 +191,7 @@ namespace Xamarin.Forms.Platform.Android
 			if (control is IPopupTrigger popupElement)
 				popupElement.ShowPopupOnFocus = true;
 
-			return control;
+			return control?.Focusable == true ? control : null;
 		}
 
 		public ViewGroup ViewGroup => this;
